@@ -321,7 +321,7 @@ app.get("/jobs/:id", (req, res) => {
     <div class="badges">
       <span class="badge ${job.isRemote ? "badge-remote" : "badge-onsite"}">${job.isRemote ? "🏠 Work From Home" : "🏢 On-Site"}</span>
       <span class="badge badge-salary">💰 ${job.salary}</span>
-      <span class="badge badge-type">⏰ ${job.employmentType.replace("_", " ")}</span>
+      <span class="badge badge-type">⏰ ${job.jobType.replace("_", " ")}</span>
       <span class="badge badge-sg">🇸🇬 Singapore</span>
     </div>
     <div class="info-grid">
