@@ -1,7 +1,7 @@
 {
-  "name": "philippines-jobs-portal",
+  "name": "singapore-jobs-portal",
   "version": "1.0.0",
-  "description": "Philippines Remote Jobs Portal - 10 Lakh Jobs",
+  "description": "Singapore Remote Jobs Portal - 10 Lakh Jobs",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
