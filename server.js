@@ -13,7 +13,7 @@ const JOBS_PER_PAGE = 20;
 const SITEMAP_CHUNK = 1000;
 const TOTAL_SITEMAPS = Math.ceil(TOTAL_JOBS / SITEMAP_CHUNK);
 const SITE_NAME = "SingaporeJobsHub.sg";
-const BASE_URL = process.env.BASE_URL || "https://singaporejobs-production.up.railway.app";
+const BASE_URL = process.env.BASE_URL || "https://web-production-11763b91.up.railway.app";
 
 app.use(compression());
 app.use(express.static("public"));
