@@ -337,7 +337,7 @@ app.get("/jobs/:id", (req, res) => {
   <div class="apply-box">
     <h3>🚀 Ready to Apply?</h3>
     <p>Join ${job.company} and start your remote career in Singapore today!</p>
-    <a class="btn-apply" href="https://remotejob09.job4intern.com/pages/job-application" target="_blank" rel="noopener">✅ Apply Now — It's Free</a>
+    <a class="btn-apply" href="https://ouchi.wowseries.lovestoblog.com/apply-now" target="_blank" rel="noopener">✅ Apply Now — It's Free</a>
   </div>
 
   <div class="job-desc">
