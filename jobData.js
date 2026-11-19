@@ -636,13 +636,9 @@ function getJob(id) {
 
   const jobType = JOB_TYPES[jobIndexInCompany % JOB_TYPES.length];
 
-  const baseDate = new Date("2025-01-01");
-  baseDate.setDate(baseDate.getDate() + (id % 180));
-  const datePosted = baseDate.toISOString().split("T")[0];
-
-  const validDate = new Date(baseDate);
-  validDate.setDate(validDate.getDate() + 90);
-  const validThrough = validDate.toISOString().split("T")[0];
+    // Fixed publish & expiry dates
+  const datePosted = "2026-11-15";
+  const validThrough = "2027-03-31";
 
   return {
     id,
