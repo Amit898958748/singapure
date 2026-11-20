@@ -18,6 +18,54 @@ const BASE_URL = process.env.BASE_URL || "https://web-production-11763b91.up.rai
 app.use(compression());
 app.use(express.static("public"));
 
+// ─── AD HELPER ─────────────────────────────────────────────────────────────
+function getAds() {
+  return {
+    top: `
+<div style="text-align:center;width:100%;padding:8px 0;background:#fff;border-bottom:1px solid #eee;">
+  <script>
+    atOptions = { 'key' : '12ed1b4d300eafe48dc3a78eb26d3d9c', 'format' : 'iframe', 'height' : 90, 'width' : 728, 'params' : {} };
+  </script>
+  <script src="https://bicea.org/22/12ed1b4d300eafe48dc3a78eb26d3d9c"></script>
+</div>
+<div style="text-align:center;width:100%;padding:8px 0;background:#fff;border-bottom:1px solid #eee;">
+  <script>
+    atOptions = { 'key' : '5d4f4ffb8b82fd9c68ee3b23c4d81a00', 'format' : 'iframe', 'height' : 60, 'width' : 468, 'params' : {} };
+  </script>
+  <script src="https://bicea.org/22/5d4f4ffb8b82fd9c68ee3b23c4d81a00"></script>
+</div>`,
+    middle: `
+<div style="text-align:center;width:100%;padding:10px 0;background:#fff;border-top:1px solid #eee;border-bottom:1px solid #eee;margin:20px 0;">
+  <script>
+    atOptions = { 'key' : '12ed1b4d300eafe48dc3a78eb26d3d9c', 'format' : 'iframe', 'height' : 90, 'width' : 728, 'params' : {} };
+  </script>
+  <script src="https://bicea.org/22/12ed1b4d300eafe48dc3a78eb26d3d9c"></script>
+</div>`,
+    bottom: `
+<div style="text-align:center;width:100%;padding:10px 0;background:#fff;border-top:1px solid #eee;margin-top:20px;">
+  <script>
+    atOptions = { 'key' : '5d4f4ffb8b82fd9c68ee3b23c4d81a00', 'format' : 'iframe', 'height' : 60, 'width' : 468, 'params' : {} };
+  </script>
+  <script src="https://bicea.org/22/5d4f4ffb8b82fd9c68ee3b23c4d81a00"></script>
+</div>`
+  };
+}
+
+// Middleware: top + bottom + middle ads on every HTML response
+app.use((req, res, next) => {
+  const originalSend = res.send.bind(res);
+  res.send = (body) => {
+    if (typeof body === "string" && body.includes("</body>")) {
+      const ads = getAds();
+      body = body.replace(/<body[^>]*>/, `$&${ads.top}`);
+      body = body.replace(/<footer/, `${ads.middle}<footer`);
+      body = body.replace(/<\/body>/, `${ads.bottom}</body>`);
+    }
+    return originalSend(body);
+  };
+  next();
+});
+
 // ─── HOME PAGE ───────────────────────────────────────────────────────────────
 app.get("/", (req, res) => {
   const featuredJobs = [];
@@ -143,7 +191,7 @@ app.get("/", (req, res) => {
 // ─── JOB LISTING PAGE ────────────────────────────────────────────────────────
 app.get("/jobs", (req, res) => {
   const page = Math.max(1, parseInt(req.query.page) || 1);
-  const typeFilter = req.query.type; // "remote" | "onsite"
+  const typeFilter = req.query.type;
   const start = (page - 1) * JOBS_PER_PAGE + 1;
   const end = Math.min(start + JOBS_PER_PAGE - 1, TOTAL_JOBS);
   const totalPages = Math.ceil(TOTAL_JOBS / JOBS_PER_PAGE);
@@ -297,13 +345,11 @@ app.get("/jobs/:id", (req, res) => {
     .btn-apply:hover{background:#f0f4f8;transform:scale(1.03)}
     .job-desc{background:#fff;border-radius:12px;padding:30px;box-shadow:0 2px 12px rgba(0,0,0,.09);margin-bottom:25px;line-height:1.7}
     .job-desc h2{font-size:1.2rem;margin-bottom:20px;color:#C8102E;border-bottom:2px solid #fde8e8;padding-bottom:10px}
-
     .nav-jobs{display:flex;justify-content:space-between;margin-bottom:30px}
     .btn-nav{background:#1a1a2e;color:#fff;padding:8px 20px;border-radius:6px;text-decoration:none;font-size:.9rem}
     .btn-nav:hover{background:#333}
     footer{background:#1a1a2e;color:#aaa;text-align:center;padding:25px}
     footer a{color:#7ba7f7}
-
   </style>
 </head>
 <body>
@@ -351,8 +397,6 @@ app.get("/jobs/:id", (req, res) => {
   </div>
 </div>
 
-
-
 <footer><p>© 2025 ${SITE_NAME} | <a href="/sitemap.xml">Sitemap</a> | <a href="/robots.txt">robots.txt</a></p></footer>
 
 </body>
@@ -362,7 +406,6 @@ app.get("/jobs/:id", (req, res) => {
 // ─── COMPANY PAGE ─────────────────────────────────────────────────────────────
 app.get("/company/:name", (req, res) => {
   const name = decodeURIComponent(req.params.name);
-  const { COMPANIES } = require("./jobData");
   const compIdx = COMPANIES.findIndex((c) => c.toLowerCase() === name.toLowerCase());
   if (compIdx === -1) return res.status(404).send("<h1>Company Not Found</h1>");
 
@@ -451,7 +494,6 @@ app.get("/company/:name", (req, res) => {
 
 // ─── ALL COMPANIES PAGE ───────────────────────────────────────────────────────
 app.get("/companies", (req, res) => {
-  const { COMPANIES } = require("./jobData");
   const companyCards = COMPANIES.map(
     (c) => `<a href="/company/${encodeURIComponent(c)}" class="company-card">
     <div class="cname">${c}</div>
@@ -575,7 +617,6 @@ ${urls.join("\n")}
 
 // ─── COMPANIES SITEMAP ────────────────────────────────────────────────────────
 app.get("/sitemap-companies.xml", (req, res) => {
-  const { COMPANIES } = require("./jobData");
   const urls = COMPANIES.map(
     (c) => `  <url>
     <loc>${BASE_URL}/company/${encodeURIComponent(c)}</loc>
